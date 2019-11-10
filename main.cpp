@@ -14,7 +14,7 @@ int main(){
 	menu mainMenu = setMenu(9);
 	addMenuOption(mainMenu, "Gerenciar Jogos");
 	addMenuOption(mainMenu, "Gerenciar Jogadores");
-	addMenuOption(mainMenu, "Gerenciar Campeonatos", 0);
+	addMenuOption(mainMenu, "Gerenciar Campeonatos");
 	addMenuOption(mainMenu, "Relatorios", 0);
 	addMenuOption(mainMenu, "Sair");
 	
@@ -31,6 +31,9 @@ int main(){
 				break;
 			case 1:
 				showGamersMainMenu();
+				break;
+			case 2:
+				showChampionshipsMainMenu();
 				break;
 		}
 		clearCanvas();

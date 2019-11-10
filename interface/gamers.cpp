@@ -56,7 +56,7 @@ void showUpdateGamerScreen(int addr){
 }
 
 void showRemoveGamerScreen(int addr){
-	printCenter("Remover Jogo", 7);
+	printCenter("Remover Jogador", 7);
 	menu removeMenu = setMenu(10);
 	char title[20];
 	strcpy(title, "Deseja mesmo remover ");
