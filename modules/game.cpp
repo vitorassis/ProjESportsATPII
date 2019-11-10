@@ -11,24 +11,24 @@ int persistNewGame(FILE*, _game);
 _game getNextGame(FILE *);
 _game getAddressedGame(FILE *, int, int);
 int updateGameRegistry(FILE *, int, _game);
-FILE *openWriteFile(const char[]);
-FILE *openAppendFile(const char[]);
-FILE *openReadFile(const char[]);
-int checkFileOpened(FILE *);
-int closeFile(FILE *);
-void createFileIfNotExists(const char[]);
-int isEndFile(FILE *);
-int getFileCursor(FILE *, int);
+int getGamesQuantity();
 
+
+
+int isGameRemoved(_game game){
+	return !game.active;
+}
 
 int exaustiveSearchGameByName(char name[]){
 	FILE *file;
+	
+	createFileIfNotExists(GAME_FILE);
 	
 	file = openReadFile(GAME_FILE);
 	_game game;
 	int ret;
 	
-	while(!isEndFile(file) && stricmp(game.name, name) != 0)
+	while(!isEndFile(file) && (stricmp(game.name, name) != 0 || isGameRemoved(game)))
 		game = getNextGame(file);
 	
 	if(isEndFile(file))
@@ -38,10 +38,6 @@ int exaustiveSearchGameByName(char name[]){
 	closeFile(file);
 	
 	return ret;
-}
-
-int isRemoved(_game game){
-	return !game.active;
 }
 
 _game getGame(int next = 1, int address = 0, int from = 0){
@@ -55,7 +51,7 @@ _game getGame(int next = 1, int address = 0, int from = 0){
 	
 	closeFile(file);
 	
-	if(isRemoved(gotGame))
+	if(isGameRemoved(gotGame))
 		gotGame.code = 0;
 	
 	return gotGame;
@@ -63,7 +59,9 @@ _game getGame(int next = 1, int address = 0, int from = 0){
 
 int insertGame(_game new_game){
 	new_game.active = 1;
+	new_game.code = getGamesQuantity() + 1;
 	createFileIfNotExists(GAME_FILE);
+
 	if(exaustiveSearchGameByName(new_game.name) == -1)
 	{
 		FILE *file = openAppendFile(GAME_FILE);
@@ -79,8 +77,10 @@ int updateGame(int address, _game game){
 	FILE *file;
 	createFileIfNotExists(GAME_FILE);
 	file = openReadFile(GAME_FILE);
+	int ret = updateGameRegistry(file, address, game);
 	closeFile(file);
-	return updateGameRegistry(file, address, game);
+	
+	return ret;
 }
 
 int removeGame(int address){
@@ -92,4 +92,14 @@ int removeGame(int address){
 	closeFile(file);
 	
 	return ret;
+}
+
+int getGamesQuantity(){
+	FILE *file;
+	file = openAppendFile(GAME_FILE);
+	setFileCursor(file, SEEK_END, 0);
+	int lastAddress = getFileCursor(file, 0);
+	closeFile(file);
+	
+	return lastAddress / sizeof(_game);
 }

@@ -1,17 +1,38 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "interface/interface.cpp"
+#include <string.h>
 #include "modules/modules.cpp"
+#include "interface/interface.cpp"
 
 int main(){
-	_game game;
-	game.code = 1;
-	strcpy(game.name, "jogo2");
-	printf("%d",insertGame(game));
-	strcpy(game.name, "jogo2");
-	printf("%d",insertGame(game));
-	printf("%s", getGame(0, sizeof(game)*2).name);
-	updateGame(0, game);
-	printf("%s", getGame(0, 0).name);
+	setCanvas('/', 1, 1);
+	drawCanvas();	
+	showTitle("Gerenciador de Campeonatos de e-Sports");
 	
+	printCenter("Menu", 7);
+		
+	menu mainMenu = setMenu(9);
+	addMenuOption(mainMenu, "Gerenciar Jogos");
+	addMenuOption(mainMenu, "Gerenciar Jogadores");
+	addMenuOption(mainMenu, "Gerenciar Campeonatos", 0);
+	addMenuOption(mainMenu, "Relatorios", 0);
+	addMenuOption(mainMenu, "Sair");
+	
+	int option;
+	
+	do{
+		option = showMenu(mainMenu);
+		
+		clearCanvas();
+		
+		switch(option){
+			case 0:
+				showGamesMainMenu();
+				break;
+			case 1:
+				showGamersMainMenu();
+				break;
+		}
+		clearCanvas();
+	}while(option != 4);
 }
