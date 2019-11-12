@@ -40,9 +40,36 @@ int exaustiveSearchGameByName(char name[]){
 	return ret;
 }
 
+int binarySearchGameByCode(int code){
+	int start = 0;
+	int last = getGamesQuantity()+1;
+	
+	int middle;
+	_game game;
+	
+	createFileIfNotExists(GAME_FILE);
+	FILE *file = openReadFile(GAME_FILE);
+	do{
+		middle = (last+start)/2;
+		game = getAddressedGame(file, 0, middle*sizeof(_game));
+		if(code < game.code)
+			last = middle;
+		else if(code > game.code)
+			start = middle+1;
+	}while(code != game.code && start < last);
+	
+	closeFile(file);
+	
+	if(game.code == code)
+		return middle;
+	else
+		return -1;
+}
+
 _game getGame(int next = 1, int address = 0, int from = 0){
 	FILE *file;
 	file = openReadFile(GAME_FILE);
+	rewind(file);
 	_game gotGame;
 	if(next)
 		gotGame = getNextGame(file);

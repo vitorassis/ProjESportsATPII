@@ -13,9 +13,9 @@ void showInsertChampionshipScreen(){
 		
 		do{
 			readString(championship.name, 45, 10, 30);
-			if(exaustiveSearchChampionshipByName(championship.name) == -1)
+			if(exaustiveSearchChampionshipByName(championship.name) != -1)
 				showToast("Campeonato ja cadastrado!", TOAST_WARNING);
-		}while(exaustiveSearchChampionshipByName(championship.name) == -1);
+		}while(exaustiveSearchChampionshipByName(championship.name) != -1);
 				
 		if(stricmp(championship.name, "\0") != 0 ){
 			removeToast();
@@ -31,18 +31,21 @@ void showInsertChampionshipScreen(){
 			do{
 				championship.year = readInt(65, 12, 4);
 				if(championship.year < 1000 || championship.year > 9999)
-					showToast("Ano deve ter quatro dígitos!", TOAST_WARNING);
+					showToast("Ano deve ter quatro digitos!", TOAST_WARNING);
 			}while(championship.year < 1000 || championship.year > 9999);
 			
 			char gameName[30];
-		
+			int gameAddr;
 			do{
 				readString(gameName, 16, 14, 30);
-				if(exaustiveSearchGameByName(gameName) == -1)
+				gameAddr = exaustiveSearchGameByName(gameName);
+				if(gameAddr == -1)
 					showToast("Jogo nao registrado!", TOAST_WARNING);
-			}while(exaustiveSearchGameByName(gameName) == -1);
+			}while(gameAddr == -1);
 		
-			championship.game = exaustiveSearchGameByName(gameName);
+			championship.game = getGame(0, gameAddr).code;
+			
+			removeToast();
 			
 			do{
 				readString(championship.description, 3, 17, 74);
@@ -50,6 +53,8 @@ void showInsertChampionshipScreen(){
 					showToast("Descricao nao pode ser nula!", TOAST_WARNING);
 			}while(stricmp(championship.description, "\0") == 0);
 		
+			removeToast();
+			
 			if(insertChampionship(championship))
 				showToast("Cadastrado com sucesso!", TOAST_SUCCESS);
 			else
@@ -61,29 +66,77 @@ void showInsertChampionshipScreen(){
 void showChampionship(int addr){
 	_championship championship = getChampionship(0, addr);
 	printCenter("Exibir Campeonato", 7);
-	gotoxy(10, 10); printf("Codigo: %d", championship.code);
-	gotoxy(25, 10); printf("Nome do Campeonato: %s", championship.name);
+	gotoxy(10, 10);printf("Codigo: %d", championship.code);
+	gotoxy(25, 10);printf("Nome do Campeonato: %s", championship.name);
+	gotoxy(10, 12);printf("Responsavel: %s", championship.organizer);
+	gotoxy(60, 12);printf("Ano: %d", championship.year);
+	gotoxy(10, 14);printf("Jogo: %s", getGame(0,binarySearchGameByCode(championship.game)*sizeof(_game)).name);
+	gotoxy(10, 16);printf("Descricao: %s", championship.description);
 	getch();
 }
 
 void showUpdateChampionshipScreen(int addr){
 	_championship championship = getChampionship(0, addr);
 	printCenter("Alterar Campeonato", 7);
-	gotoxy(10, 10); printf("Codigo: %d", championship.code);
-	gotoxy(25, 10); printf("Nome do Campeonato: ");
-	int equal;
-	char temp[20];
-	strcpy(temp, championship.name);
+	gotoxy(10, 10);printf("Codigo: %d", championship.code);
+	gotoxy(25, 10);printf("Nome do Campeonato: %s", championship.name);
+	gotoxy(10, 12);printf("Responsavel: %s", championship.organizer);
+	gotoxy(60, 12);printf("Ano: %d", championship.year);
+	gotoxy(10, 14);printf("Jogo: %s", getGame(0,binarySearchGameByCode(championship.game)*sizeof(_game)).name);
+	gotoxy(10, 16);printf("Descricao: ");
+	gotoxy(3, 17); printf("%s", championship.description);
+	int equal, tempYear = championship.year;
+	char tempName[20], tempGame[20], tempDescription[70];
+	strcpy(tempName, championship.name);
+	strcpy(tempGame, getGame(0, binarySearchGameByCode(championship.game)).name);
+	strcpy(tempDescription, championship.description);
+	removeToast();
+	
 	do{
-		readString(temp, 45, 10, 30, 1);
-		equal = exaustiveSearchChampionshipByName(temp);
-		if(equal != -1 && equal != addr){
-			showToast("Jogo ja cadastrado!", TOAST_WARNING);
-			strcpy(temp, championship.name);
+		readString(tempName, 45, 10, 30, 1);
+		equal = exaustiveSearchChampionshipByName(tempName);
+		if(equal != addr && equal != -1){
+			showToast("Ja cadastrado!", TOAST_WARNING);
+			strcpy(tempName, championship.name);
 		}
-			
-	}while(equal != -1 && equal != addr);
-	strcpy(championship.name, temp);
+	}while(equal != addr && equal != -1);
+	strcpy(championship.name, tempName);
+	
+	readString(championship.organizer, 23, 12, 30, 1);
+	
+	removeToast();
+	
+	do{
+		tempYear = readInt(65, 12, 4, championship.year);
+		if(tempYear < 1000 || tempYear > 9999){
+			showToast("Ano deve ter quatro digitos!", TOAST_WARNING);
+		}
+	}while(tempYear < 1000 || tempYear > 9999);
+	championship.year = tempYear;
+	
+	int gameAddr;
+	strcpy(tempGame, getGame(0,binarySearchGameByCode(championship.game)*sizeof(_game)).name);
+	do{
+		readString(tempGame, 16, 14, 30, 1);
+		gameAddr = exaustiveSearchGameByName(tempGame);
+		if(gameAddr == -1)
+			showToast("Jogo nao registrado!", TOAST_WARNING);
+	}while(gameAddr == -1);
+	championship.game = getGame(0, gameAddr).code;
+	
+	removeToast();
+	
+	do{
+		readString(tempDescription, 3, 17, 74, 1);
+		if(stricmp(tempDescription, "\0") == 0){
+			showToast("Descricao nao pode ser nula!", TOAST_WARNING);
+			strcpy(tempDescription, championship.description);
+		}
+	}while(stricmp(tempDescription, "\0") == 0);
+	
+	strcpy(championship.description, tempDescription);
+
+	removeToast();
 	if(updateChampionship(addr, championship))
 		showToast("Alterado com sucesso", TOAST_SUCCESS);
 	else
