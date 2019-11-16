@@ -9,7 +9,6 @@ int main(){
 	drawCanvas();	
 	showTitle("Gerenciador de Campeonatos de e-Sports");
 	
-	printCenter("Menu", 7);
 		
 	menu mainMenu = setMenu(9);
 	addMenuOption(mainMenu, "Gerenciar Jogos");
@@ -21,6 +20,7 @@ int main(){
 	int option;
 	
 	do{
+		printCenter("Menu", 7);
 		option = showMenu(mainMenu);
 		
 		clearCanvas();

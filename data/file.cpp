@@ -13,7 +13,9 @@ FILE *openWriteFile(const char fileName[]){
 	return openFile(fileName, "wb+");
 }
 FILE *openReadFile(const char fileName[]){
-	return openFile(fileName, "rb+");
+	FILE *file = openFile(fileName, "rb+");
+	
+	return file;
 }
 FILE *openAppendFile(const char fileName[]){
 	return openFile(fileName, "ab+");

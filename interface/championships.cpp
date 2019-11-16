@@ -186,7 +186,7 @@ void showConsultChampionshipScreen(){
 			addMenuOption(championshipMenu, "Exibir");
 			addMenuOption(championshipMenu, "Alterar");
 			addMenuOption(championshipMenu, "Remover");
-			addMenuOption(championshipMenu, "Competidores", 0);
+			addMenuOption(championshipMenu, "Competidores", getGamersQuantity() ? 1:0);
 			option = showMenu(championshipMenu);
 			clearCanvas();
 			switch(option){
@@ -202,6 +202,9 @@ void showConsultChampionshipScreen(){
 				case 3:
 					showRemoveChampionshipScreen(addr);
 					searchOther=1;
+					break;
+				case 4:
+					showSubscriptionsMainMenu(addr);
 			}
 		}
 		else if(addr == -1){
@@ -218,8 +221,8 @@ showChampionshipsMainMenu(){
 	do{
 		clearMenuOptions(mainMenu);
 		enableOut = getGamesQuantity() ? 1 : 0;
-		addMenuOption(mainMenu, "Cadastrar Campeonatoes");
-		addMenuOption(mainMenu, "Consultar Campeonatoes", enableOut);
+		addMenuOption(mainMenu, "Cadastrar Campeonatos");
+		addMenuOption(mainMenu, "Consultar Campeonatos", enableOut);
 		addMenuOption(mainMenu, "Voltar");
 		option = showMenu(mainMenu);
 		clearCanvas();
