@@ -55,3 +55,9 @@ int getFileCursor(FILE *file, int registySize){
 int isEndFile(FILE *file){
 	return feof(file);
 }
+
+void removeFile(const char fileName[]){
+	char path[50];
+	makeDynamicPath(path, fileName);
+	remove(path);
+}

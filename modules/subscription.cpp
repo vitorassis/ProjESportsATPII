@@ -37,7 +37,6 @@ int insertionSortGetBestAddressSubscription(int championshipCode, int gamerCode)
 	int addr = ret;
 	setFileCursor(file, SEEK_END, 0);
 	int end = getFileCursor(file, sizeof(sub));
-	getch();
 	while(addr <= end){
 		sub = getAddressedSubscription(file, 0, end);
 		updateSubscriptionRegistry(file, end+sizeof(sub), sub);
@@ -48,7 +47,7 @@ int insertionSortGetBestAddressSubscription(int championshipCode, int gamerCode)
 }
 
 
-int exaustiveSearchChampionshipSubscriptionByGamerCode(int championshipCode, int gamerCode){
+int indexedSearchChampionshipSubscriptionByGamerCode(int championshipCode, int gamerCode){
 	_subscription sub;
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	int ret;
@@ -67,9 +66,9 @@ int exaustiveSearchChampionshipSubscriptionByGamerCode(int championshipCode, int
 	return ret;
 }
 
-int exaustiveSearchChampionshipSubscriptionByGamerName(int championshipCode, char gamerName[]){
-	int gamerCode = getGamer(0, exaustiveSearchGamerByName(gamerName)).code;
-	return exaustiveSearchChampionshipSubscriptionByGamerCode(championshipCode, gamerCode);
+int indexedSearchChampionshipSubscriptionByGamerName(int championshipCode, char gamerName[]){
+	int gamerCode = getGamer(0, sentinelSearchGamerByName(gamerName)).code;
+	return indexedSearchChampionshipSubscriptionByGamerCode(championshipCode, gamerCode);
 }
 
 int exaustiveSearchChampionshipSubscriptionByNickname(int championshipCode, char nickname[]){
@@ -95,6 +94,20 @@ int insertSubscription(_subscription new_subscription){
 	updateSubscriptionRegistry(file, position, new_subscription);
 	closeFile(file);
 	return 1;
+}
+
+_subscription getSubscription(int next = 1, int address = 0, int from = 0){
+	FILE *file;
+	file = openReadFile(SUBSCRIPTION_FILE);
+	_subscription gotSubscription;
+	if(next)
+		gotSubscription = getNextSubscription(file);
+	else
+		gotSubscription = getAddressedSubscription(file, from, address);
+	
+	closeFile(file);
+	
+	return gotSubscription;
 }
 
 int getSubscriptionsQuantity(int championshipCode){

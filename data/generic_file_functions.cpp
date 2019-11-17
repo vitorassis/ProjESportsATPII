@@ -7,3 +7,4 @@ void createFileIfNotExists(const char[]);
 int isEndFile(FILE *);
 int getFileCursor(FILE *, int);
 void setFileCursor(FILE *, int, int);
+void removeFile(const char[]);

@@ -1,4 +1,5 @@
 #define GAMER_FILE "gamers.dat"
+#define GAMER_TEMP_FILE "gamers_temp.dat"
 
 struct _gamer{
 	int code;
@@ -20,28 +21,74 @@ int isGamerRemoved(_gamer gamer){
 	return !gamer.active;
 }
 
-int exaustiveSearchGamerByName(char name[]){
+int binarySearchGamerByCode(int code){
+	int start = 0;
+	int last = getGamersQuantity()+1;
+	
+	int middle;
+	_gamer gamer;
+	
+	createFileIfNotExists(GAMER_FILE);
+	FILE *file = openReadFile(GAMER_FILE);
+	do{
+		middle = (last+start)/2;
+		gamer = getAddressedGamer(file, 0, middle*sizeof(_gamer));
+		if(code < gamer.code)
+			last = middle-1;
+		else if(code > gamer.code)
+			start = middle+1;
+	}while(code != gamer.code && start < last);
+	
+	closeFile(file);
+	
+	if(gamer.code == code)
+		return middle;
+	else
+		return -1;
+}
+
+int sentinelSearchGamerByName(char name[]){
 	FILE *file;
 	
 	createFileIfNotExists(GAMER_FILE);
+	_gamer last;
+	_gamer aux;
+	last.code = getGamersQuantity()+1;
+	strcpy(last.name, name);
+	last.active = 1;
 	
+	FILE *temp = openWriteFile(GAMER_TEMP_FILE);
+		
 	file = openReadFile(GAMER_FILE);
+	
+	do{
+		aux = getNextGamer(file);
+		persistNewGamer(temp, aux);
+	}while(!isEndFile(file));
+	persistNewGamer(temp, last);
+	
+	closeFile(temp);
+	closeFile(file);
+	
+	file = openReadFile(GAMER_TEMP_FILE);
 	_gamer gamer;
 	int ret;
 	
-	while(!isEndFile(file) && (stricmp(gamer.name, name) != 0 || isGamerRemoved(gamer)))
+	while((stricmp(gamer.name, name) != 0 || isGamerRemoved(gamer)))
 		gamer = getNextGamer(file);
 	
-	if(isEndFile(file))
-		ret= -1;
-	else
+	if(gamer.code != getGamersQuantity()+1)
 		ret= getFileCursor(file, sizeof(_gamer));
+	else
+		ret= -1;
 	closeFile(file);
+	removeFile(GAMER_TEMP_FILE);
 	
 	return ret;
 }
 
 _gamer getGamer(int next = 1, int address = 0, int from = 0){
+	printf("\nGM addr: %d", address);
 	FILE *file;
 	file = openReadFile(GAMER_FILE);
 	_gamer gotGamer;
@@ -63,7 +110,7 @@ int insertGamer(_gamer new_gamer){
 	new_gamer.code = getGamersQuantity() + 1;
 	createFileIfNotExists(GAMER_FILE);
 
-	if(exaustiveSearchGamerByName(new_gamer.name) == -1)
+	if(sentinelSearchGamerByName(new_gamer.name) == -1)
 	{
 		FILE *file = openAppendFile(GAMER_FILE);
 		persistNewGamer(file, new_gamer);

@@ -9,7 +9,7 @@ void showInsertGamerScreen(){
 		
 		do{
 			readString(gamer.name, 47, 10, 30);
-			equal = exaustiveSearchGamerByName(gamer.name);
+			equal = sentinelSearchGamerByName(gamer.name);
 			if(equal != -1 && !isGamerRemoved(getGamer(0, equal)))
 				showToast("Jogador ja cadastrado!", TOAST_WARNING);
 		}while(equal != -1);
@@ -41,7 +41,7 @@ void showUpdateGamerScreen(int addr){
 	strcpy(temp, gamer.name);
 	do{
 		readString(temp, 47, 10, 30, 1);
-		equal = exaustiveSearchGamerByName(temp);
+		equal = sentinelSearchGamerByName(temp);
 		if(equal != -1 && equal != addr){
 			showToast("Jogo ja cadastrado!", TOAST_WARNING);
 			strcpy(temp, gamer.name);
@@ -89,7 +89,7 @@ void showConsultGamerScreen(){
 		else{
 			gotoxy(31, 10);printf("%s", name);
 		}
-		addr = exaustiveSearchGamerByName(name);
+		addr = sentinelSearchGamerByName(name);
 		if(addr != -1 && stricmp(name, "\0") != 0){
 			searchOther = 0;
 			removeToast();

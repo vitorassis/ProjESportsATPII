@@ -18,8 +18,8 @@ void showInsertSubscriptionScreen(_championship championship){
 			if(stricmp(gamerName, "\0") == 0 )
 				valid = 1;
 			else{
-				if(exaustiveSearchGamerByName(gamerName) != -1){
-					found = exaustiveSearchChampionshipSubscriptionByGamerName(championship.code, gamerName);
+				if(sentinelSearchGamerByName(gamerName) != -1){
+					found = indexedSearchChampionshipSubscriptionByGamerName(championship.code, gamerName);
 					if(found == -1)
 						valid = 1;
 					else
@@ -33,8 +33,7 @@ void showInsertSubscriptionScreen(_championship championship){
 		if(stricmp(gamerName, "\0") != 0  ){
 			removeToast();
 			
-			subscription.gamer = getGamer(0, exaustiveSearchGamerByName(gamerName)).code;
-			printf("\n\n\nGM code: %d", subscription.gamer);
+			subscription.gamer = getGamer(0, sentinelSearchGamerByName(gamerName)).code;
 			
 			do{
 				readString(subscription.nickname, 20, 12, 20);
@@ -52,6 +51,19 @@ void showInsertSubscriptionScreen(_championship championship){
 				showToast("Erro no cadastro!", TOAST_ERROR);
 		}
 	}while(subscription.gamer != 0);
+}
+
+void showSubscription(_championship championship, _subscription sub){
+	printf("\nGM code: %d", sub.gamer);
+	int addrGamer = binarySearchGamerByCode(sub.gamer);
+	_gamer gamer = getGamer(0, addrGamer);
+	printf("\nGM code: %d",gamer.code);
+	clearCanvas();
+	printCenter("Cadastrar Competidores", 7);
+	gotoxy(10, 10);printf("Campeonato: %s", championship.name);
+	gotoxy(40, 10);printf("Competidor: %s", gamer.name);
+	gotoxy(10, 12);printf("Nickname: %s", sub.nickname);
+	getch();
 }
 
 void showConsultSubscriptionScreen(_championship championship, int method){
@@ -74,13 +86,14 @@ void showConsultSubscriptionScreen(_championship championship, int method){
 		if(method)
 			addr = exaustiveSearchChampionshipSubscriptionByNickname(championship.code, nick);
 		else{
-			addr = exaustiveSearchGamerByName(nick);
+			addr = sentinelSearchGamerByName(nick);
 			if(addr != -1){
-				addr = exaustiveSearchChampionshipSubscriptionByGamerName(championship.code, nick);
+				addr = indexedSearchChampionshipSubscriptionByGamerName(championship.code, nick);
 			}
 		}
 		
 		if(addr != -1 && stricmp(nick, "\0") != 0){
+			_subscription sub = getSubscription(0, addr);
 			searchOther = 0;
 			removeToast();
 			menu subsMenu = setMenu(12);
@@ -95,13 +108,13 @@ void showConsultSubscriptionScreen(_championship championship, int method){
 					searchOther = 1;
 					break;
 				case 1:
-				//	showSubscription(addr);
+					showSubscription(championship, sub);
 					break;
 				case 2:
-				//	showUpdateSubscriptionScreen(addr);					
+				//	showUpdateSubscriptionScreen(sub);					
 					break;
 				case 3:
-				//	showRemoveSubscriptionScreen(addr);
+				//	showRemoveSubscriptionScreen(sub);
 					searchOther=1;
 			}
 		}
