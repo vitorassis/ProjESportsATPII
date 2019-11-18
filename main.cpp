@@ -9,7 +9,6 @@ int main(){
 	drawCanvas();	
 	showTitle("Gerenciador de Campeonatos de e-Sports");
 	
-		
 	menu mainMenu = setMenu(9);
 	addMenuOption(mainMenu, "Gerenciar Jogos");
 	addMenuOption(mainMenu, "Gerenciar Jogadores");
@@ -34,6 +33,9 @@ int main(){
 				break;
 			case 2:
 				showChampionshipsMainMenu();
+				break;
+			case 3:
+				//showReportScreen();
 				break;
 		}
 		clearCanvas();

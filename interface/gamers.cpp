@@ -74,6 +74,41 @@ void showRemoveGamerScreen(int addr){
 	}
 }
 
+void showReportGamerScreen(int addr){
+	_gamer gamer = getGamer(0, addr);
+	_subscription sub;
+	bubbleSortSubscritpionsByChampionshipGame();
+	char fileName[40];
+	strcpy(fileName, "relatorios\\");
+	strcat(fileName, gamer.name);
+	strcat(fileName, ".txt");
+	FILE *report = fopen(fileName, "w");
+	
+	fprintf(report, "Jogador selecionado: %s", gamer.name);
+	fprintf(report, "\n------------------------------------------------------------------------------------------------------------------- ");
+	sub = getSubscription();
+	int gameCode = 0;
+	int champsTotal = 0, champsSubTotal = 0;
+	while(sub.championship != 0){
+		_championship champ = getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship));
+		_game game = getGame(0, binarySearchGameByCode(champ.code));
+		if(sub.gamer == gamer.code){
+			if(gameCode != game.code){
+				fprintf(report, "\nTotal de campeonatos: %d", champsSubTotal);
+				fprintf(report, "\n------------------------------------------------------------------------------------------------------------------- ");
+				fprintf(report, "\n-> Jogo: %s",game.name);
+				gameCode = game.code;
+				champsTotal += champsSubTotal;
+				champsSubTotal = 0;
+			}
+			fprintf(report, "\n\t%s -- Responsável: %s (%d) -- Nick: %s", champ.name, champ.organizer, champ.year, sub.nickname);
+		}
+		sub = getSubscription();
+	}
+	fprintf(report, "\nTotal de campeonatos do participante: %d", champsTotal);
+	//selectionSortSubscritpionsByChampionshipCode();
+}
+
 void showConsultGamerScreen(){
 	int addr;
 	char name[30];
@@ -98,7 +133,7 @@ void showConsultGamerScreen(){
 			addMenuOption(gamerMenu, "Exibir");
 			addMenuOption(gamerMenu, "Alterar");
 			addMenuOption(gamerMenu, "Remover");
-			addMenuOption(gamerMenu, "Gerar Relatorio", 0);
+			addMenuOption(gamerMenu, "Gerar Relatorio");
 			option = showMenu(gamerMenu);
 			clearCanvas();
 			switch(option){
@@ -114,6 +149,9 @@ void showConsultGamerScreen(){
 				case 3:
 					showRemoveGamerScreen(addr);
 					searchOther=1;
+					break;
+				case 4:
+					showReportGamerScreen(addr);
 			}
 		}
 		else if(addr == -1){

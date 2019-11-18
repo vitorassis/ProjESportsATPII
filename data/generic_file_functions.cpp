@@ -8,3 +8,4 @@ int isEndFile(FILE *);
 int getFileCursor(FILE *, int);
 void setFileCursor(FILE *, int, int);
 void removeFile(const char[]);
+void renameFile(const char[], const char[]);

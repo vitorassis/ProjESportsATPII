@@ -54,16 +54,63 @@ void showInsertSubscriptionScreen(_championship championship){
 }
 
 void showSubscription(_championship championship, _subscription sub){
-	printf("\nGM code: %d", sub.gamer);
-	int addrGamer = binarySearchGamerByCode(sub.gamer);
+	int addrGamer = indexedSearchGamerByCode(sub.gamer);
 	_gamer gamer = getGamer(0, addrGamer);
-	printf("\nGM code: %d",gamer.code);
 	clearCanvas();
 	printCenter("Cadastrar Competidores", 7);
 	gotoxy(10, 10);printf("Campeonato: %s", championship.name);
 	gotoxy(40, 10);printf("Competidor: %s", gamer.name);
 	gotoxy(10, 12);printf("Nickname: %s", sub.nickname);
 	getch();
+}
+
+void showUpdateSubscriptionScreen(_championship championship, int addr){
+	_subscription sub = getSubscription(0, addr);
+	int addrGamer = indexedSearchGamerByCode(sub.gamer);
+	_gamer gamer = getGamer(0, addrGamer);
+	clearCanvas();
+	printCenter("Cadastrar Competidores", 7);
+	gotoxy(10, 10);printf("Campeonato: %s", championship.name);
+	gotoxy(40, 10);printf("Competidor: %s", gamer.name);
+	gotoxy(10, 12);printf("Nickname: %s", sub.nickname);
+	char nickname[20];
+	int found;
+	strcpy(nickname, sub.nickname);
+	do{
+		readString(nickname, 20, 12, 20, 1);
+		found = exaustiveSearchChampionshipSubscriptionByNickname(championship.code, nickname);
+		if(found != -1){
+			showToast("Nickname ja usado nesse campeonato!", TOAST_WARNING);
+			strcpy(nickname, sub.nickname);
+		}
+	}while (found != -1 && addr != found);
+	strcpy(sub.nickname, nickname);
+	if(updateSubscription(sub, addr))
+		showToast("Alterado com sucesso!", TOAST_SUCCESS);
+	else
+		showToast("Erro na alteracao!", TOAST_ERROR);
+}
+
+showRemoveSubscriptionScreen(_championship championship, int addr){
+	_subscription sub = getSubscription(0, addr);
+	printCenter("Excluir competidor:", 7);
+	printCenter(championship.name, 8);
+	char title[50];
+	strcpy(title, "Deseja mesmo excluir ");
+	strcat(title, sub.nickname);
+	strcat(title, "?");
+	printCenter(title, 9);
+		
+	menu subsRemMenu = setMenu(10);
+	addMenuOption(subsRemMenu, "Sim");
+	addMenuOption(subsRemMenu, "Cancelar");
+	switch(showMenu(subsRemMenu)){
+		case 0:
+			if(removeSubscription(sub.championship, sub.gamer))
+				showToast("Removido com sucesso!", TOAST_SUCCESS);
+			else
+				showToast("Erro na remoção!", TOAST_ERROR);
+	}
 }
 
 void showConsultSubscriptionScreen(_championship championship, int method){
@@ -111,10 +158,10 @@ void showConsultSubscriptionScreen(_championship championship, int method){
 					showSubscription(championship, sub);
 					break;
 				case 2:
-				//	showUpdateSubscriptionScreen(sub);					
+					showUpdateSubscriptionScreen(championship, addr);
 					break;
 				case 3:
-				//	showRemoveSubscriptionScreen(sub);
+					showRemoveSubscriptionScreen(championship, addr);
 					searchOther=1;
 			}
 		}

@@ -61,3 +61,10 @@ void removeFile(const char fileName[]){
 	makeDynamicPath(path, fileName);
 	remove(path);
 }
+
+void renameFile(const char old[], const char newName[]){
+	char oldPath[50], newPath[50];
+	makeDynamicPath(oldPath, old);
+	makeDynamicPath(newPath, newName);
+	rename(oldPath, newPath);
+}

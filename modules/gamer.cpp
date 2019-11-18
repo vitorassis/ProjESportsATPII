@@ -21,28 +21,18 @@ int isGamerRemoved(_gamer gamer){
 	return !gamer.active;
 }
 
-int binarySearchGamerByCode(int code){
-	int start = 0;
-	int last = getGamersQuantity()+1;
-	
-	int middle;
+int indexedSearchGamerByCode(int code){
 	_gamer gamer;
 	
 	createFileIfNotExists(GAMER_FILE);
 	FILE *file = openReadFile(GAMER_FILE);
-	do{
-		middle = (last+start)/2;
-		gamer = getAddressedGamer(file, 0, middle*sizeof(_gamer));
-		if(code < gamer.code)
-			last = middle-1;
-		else if(code > gamer.code)
-			start = middle+1;
-	}while(code != gamer.code && start < last);
 	
-	closeFile(file);
+	do{
+		gamer = getNextGamer(file);
+	}while(gamer.code < code);
 	
 	if(gamer.code == code)
-		return middle;
+		return getFileCursor(file, sizeof(gamer));
 	else
 		return -1;
 }
@@ -88,7 +78,6 @@ int sentinelSearchGamerByName(char name[]){
 }
 
 _gamer getGamer(int next = 1, int address = 0, int from = 0){
-	printf("\nGM addr: %d", address);
 	FILE *file;
 	file = openReadFile(GAMER_FILE);
 	_gamer gotGamer;

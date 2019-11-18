@@ -45,6 +45,27 @@ int exaustiveSearchChampionshipByName(char name[]){
 	return ret;
 }
 
+int exaustiveSearchChampionshipByCode(int code){
+	FILE *file;
+	
+	createFileIfNotExists(CHAMPIONSHIP_FILE);
+	
+	file = openReadFile(CHAMPIONSHIP_FILE);
+	_championship championship;
+	int ret;
+	
+	while(!isEndFile(file) && (championship.code != code || isChampionshipRemoved(championship)))
+		championship = getNextChampionship(file);
+	
+	if(isEndFile(file))
+		ret= -1;
+	else
+		ret= getFileCursor(file, sizeof(_championship));
+	closeFile(file);
+	
+	return ret;
+}
+
 _championship getChampionship(int next = 1, int address = 0, int from = 0){
 	FILE *file;
 	file = openReadFile(CHAMPIONSHIP_FILE);

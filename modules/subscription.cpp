@@ -1,4 +1,6 @@
 #define SUBSCRIPTION_FILE "subscriptions.dat"
+#define SUBS_TEMP_FILE "subscriptions_temp.dat"
+#include <conio.h>
 
 struct _subscription{
 	int championship; //CHAMPIONSHIP CODE
@@ -47,6 +49,77 @@ int insertionSortGetBestAddressSubscription(int championshipCode, int gamerCode)
 }
 
 
+int getTotalSubscriptionsQuantity(){
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	setFileCursor(file, 2, 0);
+	int last_addr = getFileCursor(file, sizeof(_subscription));
+	closeFile(file);
+	return last_addr/sizeof(_subscription);
+}
+
+
+int updateSubscription(_subscription sub, int addr){
+	createFileIfNotExists(SUBSCRIPTION_FILE);
+
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	updateSubscriptionRegistry(file, addr, sub);
+	closeFile(file);
+	return 1;
+}
+
+void bubbleSortSubscritpionsByChampionshipGame(){
+	createFileIfNotExists(SUBSCRIPTION_FILE);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	int i, total = getTotalSubscriptionsQuantity();
+	_subscription sub, sub1;
+	for(i=1; i<total; i++){
+		for(int j=0; j < total - i; j++){
+			int addr1 = j*sizeof(_subscription);
+			int addr2 = (j*sizeof(_subscription)) + sizeof(_subscription);
+			_subscription sub = getAddressedSubscription(file, 0, addr1);
+			_subscription sub1 = getAddressedSubscription(file, 0, addr2);
+			
+			int codeFirst = getGame(0, binarySearchGameByCode(getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship)).code)).code;
+			int codeSecond = getGame(0, binarySearchGameByCode(getChampionship(0, exaustiveSearchChampionshipByCode(sub1.championship)).code)).code;
+			
+			if(codeFirst > codeSecond){
+				updateSubscription(sub, j*sizeof(_subscription) + sizeof(_subscription));
+				updateSubscription(sub1, j*sizeof(_subscription));
+			}
+		}
+	}
+	closeFile(file);
+}
+
+void selectionSortSubscritpionsByChampionshipCode(){
+	createFileIfNotExists(SUBSCRIPTION_FILE);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	int j, total = getTotalSubscriptionsQuantity();
+	_subscription sub, biggerCodeSub;
+	int biggerCode, biggerJ;
+	for(int i=1; i<total; i++){
+		biggerCode = 0;
+		for(j=0; j < total - i; j++){	
+			int addr1 = j*sizeof(_subscription);
+			_subscription sub = getAddressedSubscription(file, 0, addr1);			
+			int code = getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship)).code;
+			
+			if(code > biggerCode){
+				biggerCode = code;
+				biggerCodeSub = sub;
+				biggerJ = j;
+			}
+		}
+		
+		if(biggerJ != j){
+			updateSubscription(sub, biggerJ*sizeof(_subscription));
+			updateSubscription(biggerCodeSub, (total-i)*sizeof(_subscription));
+		}
+	}
+	closeFile(file);
+}
+
+
 int indexedSearchChampionshipSubscriptionByGamerCode(int championshipCode, int gamerCode){
 	_subscription sub;
 	createFileIfNotExists(SUBSCRIPTION_FILE);
@@ -88,11 +161,27 @@ int exaustiveSearchChampionshipSubscriptionByNickname(int championshipCode, char
 
 int insertSubscription(_subscription new_subscription){
 	createFileIfNotExists(SUBSCRIPTION_FILE);
-
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
 	int position = insertionSortGetBestAddressSubscription(new_subscription.championship, new_subscription.gamer);
 	updateSubscriptionRegistry(file, position, new_subscription);
 	closeFile(file);
+	return 1;
+}
+
+int removeSubscription(int CHcode, int GMcode){
+	createFileIfNotExists(SUBSCRIPTION_FILE);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	FILE *temp = openWriteFile(SUBS_TEMP_FILE);
+	_subscription sub;
+	do{
+		sub = getNextSubscription(file);
+		if(CHcode != sub.championship || GMcode != sub.gamer)
+			persistNewSubscription(temp, sub);
+	}while(!isEndFile(file));
+	closeFile(file);
+	closeFile(temp);
+	removeFile(SUBSCRIPTION_FILE);
+	renameFile(SUBS_TEMP_FILE, SUBSCRIPTION_FILE);
 	return 1;
 }
 
@@ -129,3 +218,4 @@ int getSubscriptionsQuantity(int championshipCode){
 	
 	return quantity;
 }
+

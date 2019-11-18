@@ -84,6 +84,22 @@ _game getGame(int next = 1, int address = 0, int from = 0){
 	return gotGame;
 }
 
+_championship getNextGameChampionship(int gameCode, int actual=0){
+	createFileIfNotExists(CHAMPIONSHIP_FILE);
+	FILE *file;
+	file = openReadFile(CHAMPIONSHIP_FILE);
+	setFileCursor(file, 0, actual == 0? 0 : actual+sizeof(_championship));
+	_championship championship;
+	
+	do{
+		championship = getNextChampionship(file);
+	}while(!isEndFile(file) && championship.game != gameCode);
+	
+	if(championship.game != gameCode)
+		championship.code = 0;
+	return championship;
+}
+
 int insertGame(_game new_game){
 	new_game.active = 1;
 	new_game.code = getGamesQuantity() + 1;

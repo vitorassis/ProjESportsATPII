@@ -8,8 +8,8 @@ int persistNewSubscription(FILE *file, _subscription subscription){
 
 _subscription getNextSubscription(FILE *file){
 	_subscription buffer;
-	
-	if(checkFileOpened(file)){
+	buffer.championship = 0;
+	if(checkFileOpened(file) && !isEndFile(file)){
 		fread(&buffer, sizeof(_subscription), 1, file);
 	}
 	return buffer;
