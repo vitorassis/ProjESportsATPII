@@ -1,0 +1,7 @@
+Jogador selecionado: vitor
+------------------------------------------------------------------------------------------------------------------- 
+-> Jogo: Fortnite
+	Torneio de Fortnite -- Responsável: Epic Games (2020) -- Nick: vitor |fn
+Total de campeonatos: 1
+------------------------------------------------------------------------------------------------------------------- 
+Total de campeonatos do participante: 1
