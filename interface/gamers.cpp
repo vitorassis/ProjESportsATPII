@@ -79,34 +79,48 @@ void showReportGamerScreen(int addr){
 	_subscription sub;
 	bubbleSortSubscritpionsByChampionshipGame();
 	char fileName[40];
-	strcpy(fileName, "relatorios\\");
+	strcpy(fileName, "relatorios\\jogadores\\");
 	strcat(fileName, gamer.name);
 	strcat(fileName, ".txt");
 	FILE *report = fopen(fileName, "w");
-	
-	fprintf(report, "Jogador selecionado: %s", gamer.name);
-	fprintf(report, "\n------------------------------------------------------------------------------------------------------------------- ");
-	sub = getSubscription();
+	int subsAddr = 0;
 	int gameCode = 0;
 	int champsTotal = 0, champsSubTotal = 0;
+	_championship champ;
+	_game game;
+	
+	fprintf(report, "Jogador selecionado: %s", gamer.name);
+	sub = getSubscription(0, subsAddr);
 	while(sub.championship != 0){
-		_championship champ = getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship));
-		_game game = getGame(0, binarySearchGameByCode(champ.code));
-		if(sub.gamer == gamer.code){
+		champ = getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship));
+		game = getGame(0, binarySearchGameByCode(champ.game)*sizeof(_game));
+		if(sub.gamer == gamer.code && !isGameRemoved(game)){
 			if(gameCode != game.code){
-				fprintf(report, "\nTotal de campeonatos: %d", champsSubTotal);
+				if(gameCode)
+					fprintf(report, "\nTotal de campeonatos: %d", champsSubTotal);
 				fprintf(report, "\n------------------------------------------------------------------------------------------------------------------- ");
 				fprintf(report, "\n-> Jogo: %s",game.name);
 				gameCode = game.code;
 				champsTotal += champsSubTotal;
 				champsSubTotal = 0;
 			}
-			fprintf(report, "\n\t%s -- Responsável: %s (%d) -- Nick: %s", champ.name, champ.organizer, champ.year, sub.nickname);
+			if(!isChampionshipRemoved(champ)){
+				fprintf(report, "\n\t%s -- Responsável: %s (%d) -- Nick: %s", champ.name, champ.organizer, champ.year, sub.nickname);
+				champsSubTotal++;
+			}
 		}
-		sub = getSubscription();
+		subsAddr += sizeof(sub);
+		sub = getSubscription(0, subsAddr);
 	}
+	if(gameCode){
+		fprintf(report, "\nTotal de campeonatos: %d", champsSubTotal);
+		champsTotal += champsSubTotal;
+	}
+	fprintf(report, "\n------------------------------------------------------------------------------------------------------------------- ");
 	fprintf(report, "\nTotal de campeonatos do participante: %d", champsTotal);
-	//selectionSortSubscritpionsByChampionshipCode();
+	closeFile(report);
+	selectionSortSubscritpionsByChampionshipCode();
+	system(fileName);
 }
 
 void showConsultGamerScreen(){

@@ -82,7 +82,7 @@ void bubbleSortSubscritpionsByChampionshipGame(){
 			int codeFirst = getGame(0, binarySearchGameByCode(getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship)).code)).code;
 			int codeSecond = getGame(0, binarySearchGameByCode(getChampionship(0, exaustiveSearchChampionshipByCode(sub1.championship)).code)).code;
 			
-			if(codeFirst > codeSecond){
+			if(codeFirst < codeSecond){
 				updateSubscription(sub, j*sizeof(_subscription) + sizeof(_subscription));
 				updateSubscription(sub1, j*sizeof(_subscription));
 			}
@@ -95,27 +95,25 @@ void selectionSortSubscritpionsByChampionshipCode(){
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
 	int j, total = getTotalSubscriptionsQuantity();
-	_subscription sub, biggerCodeSub;
-	int biggerCode, biggerJ;
-	for(int i=1; i<total; i++){
-		biggerCode = 0;
-		for(j=0; j < total - i; j++){	
-			int addr1 = j*sizeof(_subscription);
-			_subscription sub = getAddressedSubscription(file, 0, addr1);			
-			int code = getChampionship(0, exaustiveSearchChampionshipByCode(sub.championship)).code;
-			
-			if(code > biggerCode){
-				biggerCode = code;
-				biggerCodeSub = sub;
-				biggerJ = j;
+	_subscription lastSub, minCodeSub;
+	int minJ, minCode;
+	int testCode;
+	
+	for(int i=0; i<total-1; i++){
+		minCode = getChampionship(0, i*sizeof(_championship)).code;
+		for(j=i+1; j<total; j++){
+			testCode = getChampionship(0, j*sizeof(_championship)).code;
+			if(testCode < minCode){
+				minCode = testCode;
+				minJ = j;
 			}
 		}
-		
-		if(biggerJ != j){
-			updateSubscription(sub, biggerJ*sizeof(_subscription));
-			updateSubscription(biggerCodeSub, (total-i)*sizeof(_subscription));
-		}
+		lastSub = getAddressedSubscription(file, 0, j*sizeof(_subscription));
+		minCodeSub = getAddressedSubscription(file, 0, minJ*sizeof(_subscription));
+		updateSubscription(lastSub, minJ*sizeof(_subscription));
+		updateSubscription(minCodeSub, j*sizeof(_subscription));
 	}
+	
 	closeFile(file);
 }
 

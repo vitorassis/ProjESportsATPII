@@ -3,3 +3,4 @@
 #include "subscriptions.cpp"
 #include "gamers.cpp"
 #include "championships.cpp"
+#include "reports.cpp"
