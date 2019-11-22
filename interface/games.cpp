@@ -76,6 +76,7 @@ void showConsultGameScreen(){
 			addMenuOption(gameMenu, "Exibir");
 			addMenuOption(gameMenu, "Alterar");
 			addMenuOption(gameMenu, "Remover");
+			addMenuOption(gameMenu, "Voltar ao menu");
 			option = showMenu(gameMenu);
 			clearCanvas();
 			switch(option){
@@ -91,6 +92,9 @@ void showConsultGameScreen(){
 				case 3:
 					showRemoveGameScreen(addr);
 					searchOther=1;
+					break;
+				case 4:
+					strcpy(name, "\0");
 			}
 		}
 		else if(addr == -1){

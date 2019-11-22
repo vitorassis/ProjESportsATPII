@@ -148,6 +148,7 @@ void showConsultGamerScreen(){
 			addMenuOption(gamerMenu, "Alterar");
 			addMenuOption(gamerMenu, "Remover");
 			addMenuOption(gamerMenu, "Gerar Relatorio");
+			addMenuOption(gamerMenu, "Voltar ao menu");
 			option = showMenu(gamerMenu);
 			clearCanvas();
 			switch(option){
@@ -166,6 +167,9 @@ void showConsultGamerScreen(){
 					break;
 				case 4:
 					showReportGamerScreen(addr);
+					break;
+				case 5:
+					strcpy(name, "\0");
 			}
 		}
 		else if(addr == -1){

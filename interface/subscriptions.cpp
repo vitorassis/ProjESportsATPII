@@ -148,6 +148,7 @@ void showConsultSubscriptionScreen(_championship championship, int method){
 			addMenuOption(subsMenu, "Exibir");
 			addMenuOption(subsMenu, "Alterar");
 			addMenuOption(subsMenu, "Remover");
+			addMenuOption(subsMenu, "Voltar ao menu");
 			option = showMenu(subsMenu);
 			clearCanvas();
 			switch(option){
@@ -163,6 +164,9 @@ void showConsultSubscriptionScreen(_championship championship, int method){
 				case 3:
 					showRemoveSubscriptionScreen(championship, addr);
 					searchOther=1;
+					break;
+				case 4:
+					strcpy(nick, "\0");
 			}
 		}
 		else if(addr == -1){

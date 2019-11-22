@@ -187,6 +187,7 @@ void showConsultChampionshipScreen(){
 			addMenuOption(championshipMenu, "Alterar");
 			addMenuOption(championshipMenu, "Remover");
 			addMenuOption(championshipMenu, "Competidores", getGamersQuantity() ? 1:0);
+			addMenuOption(championshipMenu, "Voltar ao menu");
 			option = showMenu(championshipMenu);
 			clearCanvas();
 			switch(option){
@@ -205,6 +206,9 @@ void showConsultChampionshipScreen(){
 					break;
 				case 4:
 					showSubscriptionsMainMenu(addr);
+					break;
+				case 5:
+					strcpy(name, "\0");
 			}
 		}
 		else if(addr == -1){

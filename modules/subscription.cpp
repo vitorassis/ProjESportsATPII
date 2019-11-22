@@ -1,12 +1,28 @@
 #define SUBSCRIPTION_FILE "subscriptions.dat"
 #define SUBS_TEMP_FILE "subscriptions_temp.dat"
 #include <conio.h>
-
 struct _subscription{
 	int championship; //CHAMPIONSHIP CODE
 	int gamer; //GAMER CODE
 	char nickname [20];
 };
+
+void debugSubs(){
+	int getTotalSubscriptionsQuantity();
+	_subscription getNextSubscription(FILE *);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	FILE *out = fopen("debug.txt", "w");
+	int total = getTotalSubscriptionsQuantity();
+	int i=0;
+	_subscription sub;
+	while(i<total){
+		sub = getNextSubscription(file);
+		fprintf(out, "CHAMP: %d\tGAMER: %d\tNICK: %s\n", sub.championship, sub.gamer, sub.nickname);
+		i++;
+	}
+	closeFile(file);
+	closeFile(out);
+}
 
 _subscription getNextSubscriptionByChampionship(FILE *, int);
 _subscription getNextSubscription(FILE *);
@@ -91,41 +107,118 @@ void bubbleSortSubscritpionsByChampionshipGame(){
 	closeFile(file);
 }
 
+void bubbleSortSubscritpionsByGamerName(){
+	createFileIfNotExists(SUBSCRIPTION_FILE);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	int i, total = getTotalSubscriptionsQuantity();
+	_subscription sub, sub1;
+	char nameFirst[30];
+	char nameSecond[30];
+	
+	for(i=0; i<total; i++){
+		for(int j=0; j <= total - i; j++){
+			int addr1 = j*sizeof(_subscription);
+			int addr2 = (j+1)*sizeof(_subscription);
+			_subscription sub1 = getAddressedSubscription(file, 0, addr1);
+			_subscription sub2 = getAddressedSubscription(file, 0, addr2);
+			
+			strcpy(nameFirst, getGamer(0, indexedSearchGamerByCode(sub1.gamer)).name);
+			strcpy(nameSecond, getGamer(0, indexedSearchGamerByCode(sub2.gamer)).name);
+			
+			if(stricmp(nameFirst, nameSecond) > 0){
+				updateSubscription(sub1, addr2);
+				updateSubscription(sub2, addr1);
+			}
+		}
+	}
+	closeFile(file);
+}
+
+int getSubscriptionsQuantity(int);
+
+void bubbleSortSubscritpionsByGamerCodeGroupByChampionshipCode(){
+	createFileIfNotExists(SUBSCRIPTION_FILE);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	int i, total;
+	_subscription sub, sub1, sub2;
+	
+	int iMaster =0, championshipCode = 0;;
+	
+	while(!isEndFile(file)){
+		sub = getAddressedSubscription(file, 0, iMaster*sizeof(_subscription));
+		total = getSubscriptionsQuantity(sub.championship);
+		printf("\niMaster: %d | First Nick: %s | QTTY CH %d: %d", iMaster, sub.nickname, sub.championship, total);
+		championshipCode = sub.championship;
+		sub1.championship = championshipCode;
+		sub2.championship = championshipCode;
+		
+		for(i=1; i<total && sub1.championship == championshipCode && sub1.championship == championshipCode; i++){
+			for(int j=0; j <= total - i; j++){
+				int addr1 = (iMaster+j)*sizeof(_subscription);
+				int addr2 = (iMaster+j+1)*sizeof(_subscription);
+				sub1 = getAddressedSubscription(file, 0, addr1);
+				sub2 = getAddressedSubscription(file, 0, addr2);
+				
+				int codeFirst= sub1.gamer;
+				int codeSecond= sub2.gamer;
+				printf("\nCH: %d | GM1: %d", sub1.championship, codeFirst);
+				
+				if(codeFirst > codeSecond){
+					updateSubscription(sub1, addr2);
+					updateSubscription(sub2, addr1);
+				}
+			}
+			iMaster+=total+1;
+			getch();
+		}
+	}
+	
+	closeFile(file);
+}
+
 void selectionSortSubscritpionsByChampionshipCode(){
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
 	int j, total = getTotalSubscriptionsQuantity();
-	_subscription lastSub, minCodeSub;
-	int minJ, minCode;
-	int testCode;
+	int maxCode, maxJ, code;
+	_subscription subMax, subLast;
 	
-	for(int i=0; i<total-1; i++){
-		minCode = getChampionship(0, i*sizeof(_championship)).code;
-		for(j=i+1; j<total; j++){
-			testCode = getChampionship(0, j*sizeof(_championship)).code;
-			if(testCode < minCode){
-				minCode = testCode;
-				minJ = j;
+	for(  ;total>1; total--){
+		maxCode = getAddressedSubscription(file, 0, 0).championship;
+		maxJ = 0;
+		for(j=1; j<total; j++){
+			code = getAddressedSubscription(file, 0, j*sizeof(_subscription)).championship;
+			if(code > maxCode){
+				maxCode = code;
+				maxJ = j;
 			}
 		}
-		lastSub = getAddressedSubscription(file, 0, j*sizeof(_subscription));
-		minCodeSub = getAddressedSubscription(file, 0, minJ*sizeof(_subscription));
-		updateSubscription(lastSub, minJ*sizeof(_subscription));
-		updateSubscription(minCodeSub, j*sizeof(_subscription));
+		subMax = getAddressedSubscription(file, 0, maxJ*sizeof(_subscription));
+		subLast = getAddressedSubscription(file, 0, (j-1)*sizeof(_subscription));
+		
+		updateSubscription(subMax, (j-1)*sizeof(_subscription));
+		updateSubscription(subLast, maxJ*sizeof(_subscription));
+		
 	}
 	
 	closeFile(file);
 }
 
 
-int indexedSearchChampionshipSubscriptionByGamerCode(int championshipCode, int gamerCode){
+int indexedSearchChampionshipSubscriptionByGamerCode(int championshipCode, int gamerCode, int tempFile = 0){
 	_subscription sub;
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	int ret;
-	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	FILE *file;
+	if(tempFile){
+		createFileIfNotExists(SUBS_TEMP_FILE);
+		file = openReadFile(SUBS_TEMP_FILE);
+	}
+	else
+		file = openReadFile(SUBSCRIPTION_FILE);
 	
 	sub = getNextSubscriptionByChampionship(file, championshipCode );
-	while(!isEndFile(file) && sub.gamer != gamerCode)
+	while(!isEndFile(file) && sub.gamer < gamerCode)
 	{
 		sub = getNextSubscriptionByChampionship(file, championshipCode);
     }
@@ -157,12 +250,18 @@ int exaustiveSearchChampionshipSubscriptionByNickname(int championshipCode, char
 	return ret;
 }
 
+void cleanSubscriptionsFile(void);
+
 int insertSubscription(_subscription new_subscription){
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
 	int position = insertionSortGetBestAddressSubscription(new_subscription.championship, new_subscription.gamer);
 	updateSubscriptionRegistry(file, position, new_subscription);
 	closeFile(file);
+	
+	debugSubs();
+	
+	cleanSubscriptionsFile();
 	return 1;
 }
 
@@ -180,6 +279,7 @@ int removeSubscription(int CHcode, int GMcode){
 	closeFile(temp);
 	removeFile(SUBSCRIPTION_FILE);
 	renameFile(SUBS_TEMP_FILE, SUBSCRIPTION_FILE);
+	cleanSubscriptionsFile();
 	return 1;
 }
 
@@ -203,13 +303,12 @@ int getSubscriptionsQuantity(int championshipCode){
 	file = openReadFile(SUBSCRIPTION_FILE);
 	int quantity = 0;
 	_subscription sub;
-	sub.championship = -1;
 	
 	do{
-		sub = getNextSubscriptionByChampionship(file, championshipCode );
+		sub = getNextSubscription(file);
 		if(sub.championship == championshipCode)
 			quantity++;
-	}while(!isEndFile(file) && sub.championship != championshipCode);
+	}while(!isEndFile(file) && sub.championship <= championshipCode);
 	
 	
 	closeFile(file);
@@ -217,3 +316,18 @@ int getSubscriptionsQuantity(int championshipCode){
 	return quantity;
 }
 
+void cleanSubscriptionsFile(){
+	FILE *temp = openWriteFile(SUBS_TEMP_FILE);
+	FILE *file = openReadFile(SUBSCRIPTION_FILE);
+	
+	_subscription sub;
+	while(!isEndFile(file)){
+		sub = getNextSubscription(file);
+		if(sub.championship != 0 && indexedSearchChampionshipSubscriptionByGamerCode(sub.championship, sub.gamer, 1) == -1)
+			persistNewSubscription(temp, sub);
+	}
+	closeFile(file);
+	closeFile(temp);
+	removeFile(SUBSCRIPTION_FILE);
+	renameFile(SUBS_TEMP_FILE, SUBSCRIPTION_FILE);
+}
