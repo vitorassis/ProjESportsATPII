@@ -1,7 +1,16 @@
 Jogador selecionado: vitor
 ------------------------------------------------------------------------------------------------------------------- 
--> Jogo: Fortnite
-	Torneio de Fortnite -- Responsável: Epic Games (2020) -- Nick: vitor |fn
+-> Jogo: League of Legends
+	mundial de LOL -- Responsável: Riot Games (2019) -- Nick: vitor lol
+	copa de lolzinho da quebrada -- Responsável: Riot de SÆo Paulo (2019) -- Nick: vitin da quebrada
+Total de campeonatos: 2
+------------------------------------------------------------------------------------------------------------------- 
+-> Jogo: cs:go
+	mundial de cs:go -- Responsável: Valve (2019) -- Nick: vitor CS
 Total de campeonatos: 1
 ------------------------------------------------------------------------------------------------------------------- 
-Total de campeonatos do participante: 1
+-> Jogo: Fortnite
+	copa de fortnite -- Responsável: Epic Games (2019) -- Nick: vitorFN
+Total de campeonatos: 1
+------------------------------------------------------------------------------------------------------------------- 
+Total de campeonatos do participante: 4

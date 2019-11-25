@@ -107,30 +107,41 @@ void bubbleSortSubscritpionsByChampionshipGame(){
 	closeFile(file);
 }
 
-void bubbleSortSubscritpionsByGamerName(){
+int getSubscriptionsQuantity(int);
+
+void bubbleSortSubscritpionsByGamerNameGroupByChampionshipCode(){
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
-	int i, total = getTotalSubscriptionsQuantity();
-	_subscription sub, sub1;
-	char nameFirst[30];
-	char nameSecond[30];
+	int addr1, addr2, champCode=0, i=0, j, iMaster=i, total=0, totalMaster=getTotalSubscriptionsQuantity();
+	_subscription sub, sub1, sub2;
+	char name1[30], name2[30];
 	
-	for(i=0; i<total; i++){
-		for(int j=0; j <= total - i; j++){
-			int addr1 = j*sizeof(_subscription);
-			int addr2 = (j+1)*sizeof(_subscription);
-			_subscription sub1 = getAddressedSubscription(file, 0, addr1);
-			_subscription sub2 = getAddressedSubscription(file, 0, addr2);
-			
-			strcpy(nameFirst, getGamer(0, indexedSearchGamerByCode(sub1.gamer)).name);
-			strcpy(nameSecond, getGamer(0, indexedSearchGamerByCode(sub2.gamer)).name);
-			
-			if(stricmp(nameFirst, nameSecond) > 0){
-				updateSubscription(sub1, addr2);
-				updateSubscription(sub2, addr1);
+	while(iMaster < totalMaster){
+		sub = getAddressedSubscription(file, 0, iMaster*sizeof(_subscription));
+		champCode = sub.championship;
+		total = getSubscriptionsQuantity(champCode);
+		
+		for(i = 1; i<total; i++){
+			for(j = 0; j<total-i; j++){
+				addr1 = (iMaster+j)*sizeof(_subscription);
+				addr2 = (iMaster+j+1)*sizeof(_subscription);
+				
+				sub1 = getAddressedSubscription(file, 0, addr1);
+				sub2 = getAddressedSubscription(file, 0, addr2);
+				
+				strcpy(name1, getGamer(0, indexedSearchGamerByCode(sub1.gamer)).name);
+				strcpy(name2, getGamer(0, indexedSearchGamerByCode(sub2.gamer)).name);
+				
+				if(stricmp(name1, name2) > 0){
+					updateSubscription(sub1, addr2);
+					updateSubscription(sub2, addr1);
+				}
 			}
 		}
+		
+		iMaster += total;
 	}
+	
 	closeFile(file);
 }
 
@@ -139,38 +150,30 @@ int getSubscriptionsQuantity(int);
 void bubbleSortSubscritpionsByGamerCodeGroupByChampionshipCode(){
 	createFileIfNotExists(SUBSCRIPTION_FILE);
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
-	int i, total;
+	int addr1, addr2, champCode=0, i=0, j, iMaster=i, total=0, totalMaster=getTotalSubscriptionsQuantity();
 	_subscription sub, sub1, sub2;
 	
-	int iMaster =0, championshipCode = 0;;
-	
-	while(!isEndFile(file)){
+	while(iMaster < totalMaster){
 		sub = getAddressedSubscription(file, 0, iMaster*sizeof(_subscription));
-		total = getSubscriptionsQuantity(sub.championship);
-		printf("\niMaster: %d | First Nick: %s | QTTY CH %d: %d", iMaster, sub.nickname, sub.championship, total);
-		championshipCode = sub.championship;
-		sub1.championship = championshipCode;
-		sub2.championship = championshipCode;
+		champCode = sub.championship;
+		total = getSubscriptionsQuantity(champCode);
 		
-		for(i=1; i<total && sub1.championship == championshipCode && sub1.championship == championshipCode; i++){
-			for(int j=0; j <= total - i; j++){
-				int addr1 = (iMaster+j)*sizeof(_subscription);
-				int addr2 = (iMaster+j+1)*sizeof(_subscription);
+		for(i = 1; i<total; i++){
+			for(j = 0; j<total-i; j++){
+				addr1 = (iMaster+j)*sizeof(_subscription);
+				addr2 = (iMaster+j+1)*sizeof(_subscription);
+				
 				sub1 = getAddressedSubscription(file, 0, addr1);
 				sub2 = getAddressedSubscription(file, 0, addr2);
 				
-				int codeFirst= sub1.gamer;
-				int codeSecond= sub2.gamer;
-				printf("\nCH: %d | GM1: %d", sub1.championship, codeFirst);
-				
-				if(codeFirst > codeSecond){
+				if(sub1.gamer > sub2.gamer){
 					updateSubscription(sub1, addr2);
 					updateSubscription(sub2, addr1);
 				}
 			}
-			iMaster+=total+1;
-			getch();
 		}
+		
+		iMaster += total;
 	}
 	
 	closeFile(file);
@@ -317,17 +320,22 @@ int getSubscriptionsQuantity(int championshipCode){
 }
 
 void cleanSubscriptionsFile(){
-	FILE *temp = openWriteFile(SUBS_TEMP_FILE);
+	FILE *temp;
 	FILE *file = openReadFile(SUBSCRIPTION_FILE);
 	
 	_subscription sub;
 	while(!isEndFile(file)){
 		sub = getNextSubscription(file);
-		if(sub.championship != 0 && indexedSearchChampionshipSubscriptionByGamerCode(sub.championship, sub.gamer, 1) == -1)
+		int found = indexedSearchChampionshipSubscriptionByGamerCode(sub.championship, sub.gamer, 1);
+		if(sub.championship != 0 && found == -1){
+			temp = openAppendFile(SUBS_TEMP_FILE);
 			persistNewSubscription(temp, sub);
+			closeFile(temp);
+			
+		}
+			
 	}
 	closeFile(file);
-	closeFile(temp);
 	removeFile(SUBSCRIPTION_FILE);
 	renameFile(SUBS_TEMP_FILE, SUBSCRIPTION_FILE);
 }

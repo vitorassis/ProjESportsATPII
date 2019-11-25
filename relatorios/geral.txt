@@ -4,44 +4,19 @@ Descrição:
 Mundial do popular jogo Counter-Strike:Global Offensive
 
 Participantes (em ordem alfabética):
--lucas
--luisa
+-joao
+-maria
+-vitor
 
 -------------------------------------------------------------------------------------------------------------------
 mundial de LOL
 Responsável: Riot Games - 2019 - League of Legends
 Descrição:
 Mundial do Jogo League of Legends
-
-Participantes (em ordem alfabética):
--vitor
-
--------------------------------------------------------------------------------------------------------------------
-mundial de cs:go
-Responsável: Valve - 2019 - cs:go
-Descrição:
-Mundial do popular jogo Counter-Strike:Global Offensive
 
 Participantes (em ordem alfabética):
 -clarice
-
--------------------------------------------------------------------------------------------------------------------
-mundial de LOL
-Responsável: Riot Games - 2019 - League of Legends
-Descrição:
-Mundial do Jogo League of Legends
-
-Participantes (em ordem alfabética):
--lucas
--joao pedro
--vitor
--vitor
--vitor
--vitor
--vitor
--vitor
--vitor
--vitor
+-joao
 -vitor
 
 -------------------------------------------------------------------------------------------------------------------
@@ -51,6 +26,25 @@ Descrição:
 Jooj de forinit
 
 Participantes (em ordem alfabética):
--luisa
--joao pedro
 -joao
+-joao pedro
+-lucas
+-luisa
+
+-------------------------------------------------------------------------------------------------------------------
+copa de lolzinho da quebrada
+Responsável: Riot de SÆo Paulo - 2019 - League of Legends
+Descrição:
+Copinha de Lol
+
+Participantes (em ordem alfabética):
+-vitor
+
+-------------------------------------------------------------------------------------------------------------------
+copa de fortnite
+Responsável: Epic Games - 2019 - Fortnite
+Descrição:
+Jooj de forinit
+
+Participantes (em ordem alfabética):
+-vitor
