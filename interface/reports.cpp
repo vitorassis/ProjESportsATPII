@@ -1,5 +1,4 @@
 void showReportScreen(){
-	void debugSubs(void);
 	cleanSubscriptionsFile();
 	selectionSortSubscritpionsByChampionshipCode();
 	bubbleSortSubscritpionsByGamerNameGroupByChampionshipCode();
@@ -45,5 +44,4 @@ void showReportScreen(){
 	selectionSortSubscritpionsByChampionshipCode();
 	bubbleSortSubscritpionsByGamerCodeGroupByChampionshipCode();
 	
-	debugSubs();
 }

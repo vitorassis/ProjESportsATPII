@@ -7,22 +7,6 @@ struct _subscription{
 	char nickname [20];
 };
 
-void debugSubs(){
-	int getTotalSubscriptionsQuantity();
-	_subscription getNextSubscription(FILE *);
-	FILE *file = openReadFile(SUBSCRIPTION_FILE);
-	FILE *out = fopen("debug.txt", "w");
-	int total = getTotalSubscriptionsQuantity();
-	int i=0;
-	_subscription sub;
-	while(i<total){
-		sub = getNextSubscription(file);
-		fprintf(out, "CHAMP: %d\tGAMER: %d\tNICK: %s\n", sub.championship, sub.gamer, sub.nickname);
-		i++;
-	}
-	closeFile(file);
-	closeFile(out);
-}
 
 _subscription getNextSubscriptionByChampionship(FILE *, int);
 _subscription getNextSubscription(FILE *);
@@ -261,8 +245,6 @@ int insertSubscription(_subscription new_subscription){
 	int position = insertionSortGetBestAddressSubscription(new_subscription.championship, new_subscription.gamer);
 	updateSubscriptionRegistry(file, position, new_subscription);
 	closeFile(file);
-	
-	debugSubs();
 	
 	cleanSubscriptionsFile();
 	return 1;
